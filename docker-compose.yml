@@ -1,0 +1,32 @@
+version: '3.9'
+
+services:
+  app:
+    build: .
+    image: merepresenta-api:latest
+    environment: 
+      MONGO_URL: mongodb://mongo/merepresenta
+      ORIGINS: localhost,*.merepresenta.info
+      PORT: '3000'
+      SECRET: JgJX8pBxrSm3GT69afhj2hCT5A7tbk2u
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongo
+    # tty: true
+    networks:
+      - database
+
+  mongo:
+    image: mongo:3.6
+    ports:
+      - 27017:27017
+    # Optionally mount external data directory
+    volumes:
+      - ./data3.6:/data/db
+    networks:
+      - database
+
+networks:
+  database:
+    driver: bridge

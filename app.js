@@ -91,7 +91,7 @@ app.get("/twitter/:screenName", async (req, res) => {
       })
     }
     console.log(`[mongo] Found screen_name! ${data.screen_name}`);
-    const dataRes = utils.pick(data,['screen_name','name','profile_image_url'])
+    const dataRes = utils.pick(data,['screen_name','name','profile_image_url','followers_count','description'])
     return res.status(200).send({
       data: dataRes
     })
@@ -154,7 +154,17 @@ app.get("/twitter/:screenName/tweets", async (req, res) => {
   }
 });
 
-app.post("/upload/csv", upload.single("csvFile"), async (req, res) => {
+const checkBearer = async (req, res, next) => {
+  if(req.header('authorization') != `Bearer ${config.secret}`){
+    return res.status(403).send({
+      message: 'Forbidden. Wrong secret.'
+    })
+  }
+  console.log('Correct bearer token')
+  next()
+};
+
+app.post("/upload/csv", checkBearer, upload.single("csvFile"), async (req, res) => {
   try {
     const dbConnect = dbo.getDb();
 
