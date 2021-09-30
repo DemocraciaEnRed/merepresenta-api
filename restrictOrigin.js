@@ -1,4 +1,6 @@
-const allowedOrigins = ["localhost"]; //list of allowed domains
+const config = require('./config')
+
+const allowedOrigins = config.origins; //list of allowed domains
 
 module.exports = (req, res, next) => {
   let isDomainAllowed = allowedOrigins.indexOf(req.hostname) !== -1;
