@@ -52,7 +52,7 @@ const app = express();  //Create new instance
 const PORT = process.env.PORT || 5000; //Declare the port number
 app.use(express.json()); //allows us to access request body as req.body
 app.use(morgan("dev"));  //enable incoming request logging in dev mode
-app.use(restrictOrigin)
+// app.use(restrictOrigin)
 
 
 
