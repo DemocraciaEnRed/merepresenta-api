@@ -70,8 +70,6 @@ dbo.connectToServer(function (err) {
   });
 });
 
-
-
 app.get("/twitter/:screenName", async (req, res) => {
   try {
     const dbConnect = dbo.getDb();
@@ -236,4 +234,11 @@ app.post("/upload/csv", checkBearer, upload.single("csvFile"), async (req, res) 
       message: "Could not upload the file: " + req.file.originalname,
     });
   }
+})
+
+
+app.get("*", async (req, res) => {
+  return res.status(404).send({
+    message: "Not found"
+  })
 })
