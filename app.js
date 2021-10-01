@@ -7,40 +7,14 @@ const express = require("express");
 const morgan = require("morgan");
 const mongodb = require("mongodb");
 const stream = require('stream');
-
 // const { ConnectionClosedEvent } = require('mongodb');
 // const restrictOrigin = require('./restrictOrigin')
 const conn = require('./conn');
-
-const fs = require('fs');
-
 // Multer - Multer is a node.js middleware for handling multipart/form-data, which is primarily used for uploading files.
 const multer = require('multer');
-/**
- * The memory storage engine stores the files in memory as Buffer objects. It doesn't have any options.
- * 
- * const storage = multer.memoryStorage()
- * const upload = multer({ storage: storage })
- * 
- * When using memory storage, the file info will contain a field called buffer that contains the entire file.
- * 
- * WARNING: Uploading very large files, or relatively small files in large numbers very quickly, can cause your application to run out of memory when memory storage is used.
- */
-// Filter for CSV file
-// Set global directory
-global.__basedir = __dirname;
 
-// // Multer Upload Storage
-// const storage = multer.diskStorage({
-  //   destination: (req, file, cb) => {
-    //     cb(null, __basedir + '/uploads/')
-    //   },
-    //   filename: (req, file, cb) => {
-      //     cb(null, file.fieldname + "-" + Date.now() + "-" + file.originalname)
-      //   }
-      // });
-      
-      // Filter for CSV file
+
+
 const csvFilter = (req, file, cb) => {
   if (file.mimetype.includes("csv")) {
     cb(null, true);
@@ -48,7 +22,6 @@ const csvFilter = (req, file, cb) => {
     cb("Please upload only csv file.", false);
   }
 };
-// const upload = multer({ storage: storage, fileFilter: csvFilter });
 
 const storage = multer.memoryStorage()
 const upload = multer({ storage: storage, fileFilter: csvFilter })
@@ -59,8 +32,6 @@ const PORT = process.env.PORT || 5000; //Declare the port number
 app.use(express.json()); //allows us to access request body as req.body
 app.use(morgan("dev"));  //enable incoming request logging in dev mode
 // app.use(restrictOrigin)
-
-
 
 //Define the endpoint
 
