@@ -6,14 +6,16 @@ const csv = require("fast-csv")
 const express = require("express");
 const morgan = require("morgan");
 const mongodb = require("mongodb");
+const stream = require('stream');
+
+// const { ConnectionClosedEvent } = require('mongodb');
+// const restrictOrigin = require('./restrictOrigin')
+const conn = require('./conn');
 
 const fs = require('fs');
-const restrictOrigin = require('./restrictOrigin')
 
 // Multer - Multer is a node.js middleware for handling multipart/form-data, which is primarily used for uploading files.
 const multer = require('multer');
-const { ConnectionClosedEvent } = require('mongodb');
-const conn = require('./conn');
 /**
  * The memory storage engine stores the files in memory as Buffer objects. It doesn't have any options.
  * 
@@ -28,17 +30,17 @@ const conn = require('./conn');
 // Set global directory
 global.__basedir = __dirname;
 
-// Multer Upload Storage
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, __basedir + '/uploads/')
-  },
-  filename: (req, file, cb) => {
-    cb(null, file.fieldname + "-" + Date.now() + "-" + file.originalname)
-  }
-});
-
-// Filter for CSV file
+// // Multer Upload Storage
+// const storage = multer.diskStorage({
+  //   destination: (req, file, cb) => {
+    //     cb(null, __basedir + '/uploads/')
+    //   },
+    //   filename: (req, file, cb) => {
+      //     cb(null, file.fieldname + "-" + Date.now() + "-" + file.originalname)
+      //   }
+      // });
+      
+      // Filter for CSV file
 const csvFilter = (req, file, cb) => {
   if (file.mimetype.includes("csv")) {
     cb(null, true);
@@ -46,10 +48,14 @@ const csvFilter = (req, file, cb) => {
     cb("Please upload only csv file.", false);
   }
 };
-const upload = multer({ storage: storage, fileFilter: csvFilter });
+// const upload = multer({ storage: storage, fileFilter: csvFilter });
+
+const storage = multer.memoryStorage()
+const upload = multer({ storage: storage, fileFilter: csvFilter })
 
 const app = express();  //Create new instance
 const PORT = process.env.PORT || 5000; //Declare the port number
+
 app.use(express.json()); //allows us to access request body as req.body
 app.use(morgan("dev"));  //enable incoming request logging in dev mode
 // app.use(restrictOrigin)
@@ -165,17 +171,24 @@ const checkBearer = async (req, res, next) => {
 app.post("/upload/csv", checkBearer, upload.single("csvFile"), async (req, res) => {
   try {
     const dbConnect = dbo.getDb();
-
+    
     if (req.file == undefined) {
       return res.status(400).send({
         message: "Please upload a CSV file!"
       });
     }
-
+    
     // Import CSV File to MongoDB database
     let csvData = [];
-    let filePath = __basedir + '/uploads/' + req.file.filename;
-    fs.createReadStream(filePath)
+    let theFile = req.file.buffer.toString('utf8');
+    // Initiate the source
+    var bufferStream = new stream.PassThrough();
+    
+    // Write your buffer
+    bufferStream.end(Buffer.from(theFile));
+    
+    // Pipe it to something else  (i.e. stdout)
+    bufferStream
       .pipe(csv.parse({ headers: true }))
       .on("error", (error) => {
         throw error.message;
