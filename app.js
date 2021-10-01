@@ -7,6 +7,7 @@ const express = require("express");
 const morgan = require("morgan");
 const mongodb = require("mongodb");
 const stream = require('stream');
+var cors = require('cors')
 // const { ConnectionClosedEvent } = require('mongodb');
 // const restrictOrigin = require('./restrictOrigin')
 const conn = require('./conn');
@@ -31,6 +32,7 @@ const PORT = process.env.PORT || 5000; //Declare the port number
 
 app.use(express.json()); //allows us to access request body as req.body
 app.use(morgan("dev"));  //enable incoming request logging in dev mode
+app.use(cors())
 // app.use(restrictOrigin)
 
 //Define the endpoint
