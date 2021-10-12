@@ -161,8 +161,11 @@ app.get("/twitter/:screenName", async (req, res) => {
       mongodb.MongoClient.connect(data.url_path, {useUnifiedTopology: true}),
     ]).then(async (clients) => {
         console.log(`[external mongo] External DBs Connected!`);
-        console.log(clients[0].s.url)
-        console.log(clients[1].s.url)
+        console.log(`[external mongo] mongoUrl: ${clients[0].s.url}`)
+        console.log(`[external mongo] Database: ${config.perfilesMongoDatabase} / Collection ${config.perfilesMongoCollection}`);
+        console.log(`[external mongo] mongoUrl: ${clients[1].s.url}`)
+        console.log(`[external mongo] Database: ${data.database} / Collection ${data.screen_name}`);
+
         const dbConnProfile = clients[0].db(config.perfilesMongoDatabase)
         const collectionProfile = dbConnProfile.collection(config.perfilesMongoCollection)
         const dbConnTweets = clients[1].db(data.database)
