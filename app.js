@@ -240,6 +240,11 @@ app.get("/twitter/:screenName", async (req, res) => {
             popularTweets: resultsWithEmbebed
           }
         })
+    }).catch( error => {
+      console.log("catch error-", error);
+      res.status(500).send({
+        message: "No se pudo conectar a las bases de datos externas. No se pudo obtener toda la informacion requerida. Pruebe mas tarde",
+      });
     })
     // mongodb.MongoClient.connect(data.url_path, {
     //     useUnifiedTopology: true,
@@ -269,7 +274,7 @@ app.get("/twitter/:screenName", async (req, res) => {
   } catch (error) {
     console.log("catch error-", error);
     res.status(500).send({
-      message: "Could not upload the file: " + req.file.originalname,
+      message: "Error. No se pudo obtener toda la informacion requerida. Pruebe mas tarde",
     });
   }
 });
